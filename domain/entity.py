@@ -1,3 +1,5 @@
+import datetime
+
 class instance:
   id:                  str
   availability_domain: str
@@ -13,3 +15,22 @@ class instance:
     self.display_name        = display_name
     self.fault_domain        = fault_domain
     self.shape               = shape
+
+class job_response:
+  id:              str
+  stack_id:        str
+  lifecycle_state: str
+  operation:       str
+  error_message:   str
+  time_created:    datetime.datetime
+  time_finished:   datetime.datetime
+
+  def __init__(self, id:str, stack_id:str, lifecycle_state:str, operation:str, error_message:str, time_created:datetime.datetime, time_finished:datetime.datetime):
+    self.id              = id
+    self.stack_id        = stack_id
+    self.lifecycle_state = lifecycle_state
+    self.operation       = operation
+    self.error_message   = error_message
+    self.time_created    = time_created
+    self.time_finished   = time_finished
+

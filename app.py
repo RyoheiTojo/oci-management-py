@@ -11,8 +11,8 @@ if __name__ == '__main__':
   availability_domain = config['Environment']['availability_domain']
   region = config['Environment']['region']
 
-  instance_id = config['Scaleout']['instance_id']
+  stack_id = config['Scaleout']['stack_id']
 
   interactor = OCIInteractor()
-  res = interactor.duplicate_instance(compartment_id=compartment_id, availability_domain=availability_domain, instance_id=instance_id, region=region)
-  print(res)
+  res = interactor.apply_rm_stack(stack_id = stack_id)
+  print(vars(res))
