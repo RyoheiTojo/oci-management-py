@@ -3,7 +3,7 @@ import domain.entity
 
 from typing import List
 
-class OCIInteractor:
+class PythonOCIGateway:
     signer: oci.signer.Signer
 
     def __init__(self):
