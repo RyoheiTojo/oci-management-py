@@ -1,3 +1,6 @@
+import sys
+
+from adaptor.controller import CliController
 from adaptor.gateway import PythonOCIGateway
 from usecase.interactor import DefaultInteractor
 
@@ -8,11 +11,19 @@ if __name__ == '__main__':
     config = ConfigParser()
     config.read('./config.ini', encoding='utf-8')
 
+    if len(sys.argv) < 2:
+        print("Usage: python3 app.py <subcommand> [option]")
+        sys.exit(1)
     
-    interactor = DefaultInteractor(
-        oci_gateway       = PythonOCIGateway(),
-        scaleout_stack_id = config['Scaleout']['stack_id']
+    controller = CliController(
+        usecase = DefaultInteractor(
+            oci_gateway       = PythonOCIGateway(),
+            scaleout_stack_id = config['Scaleout']['stack_id']
+            )
         )
 
-    res = interactor.scaleout()
-    print(vars(res))
+    if sys.argv[1] == "scaleout":
+        controller.scaleout()
+    else:
+        print("Unknown subcommand.")
+        sys.exit(1)
