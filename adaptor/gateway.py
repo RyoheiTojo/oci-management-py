@@ -75,3 +75,25 @@ class PythonOCIGateway:
             time_created    = apply_response.data.time_created,
             time_finished   = apply_response.data.time_finished,
         )
+
+    def destroy_rm_stack(self, stack_id:str) -> domain.entity.job_response:
+        rm_client = oci.resource_manager.ResourceManagerClient(config={}, signer=self.signer)
+        composite_operations = oci.resource_manager.ResourceManagerClientCompositeOperations(client = rm_client)
+
+        destroy_response = composite_operations.create_job_and_wait_for_state(
+            wait_for_states    = ["SUCCEEDED", "FAILED", "UNKNOWN_ENUM_VALUE"],
+            create_job_details = oci.resource_manager.models.CreateJobDetails(
+                stack_id              = stack_id,
+                job_operation_details = oci.resource_manager.models.CreateDestroyJobOperationDetails(execution_plan_strategy = "AUTO_APPROVED"),
+            )
+        )
+        return domain.entity.job_response(
+            id              = destroy_response.data.id,
+            stack_id        = destroy_response.data.stack_id,
+            lifecycle_state = destroy_response.data.lifecycle_state,
+            error_message   = "" if destroy_response.data.failure_details == None else destroy_response.data.failure_details.message,
+            operation       = destroy_response.data.operation,
+            time_created    = destroy_response.data.time_created,
+            time_finished   = destroy_response.data.time_finished,
+        )
+

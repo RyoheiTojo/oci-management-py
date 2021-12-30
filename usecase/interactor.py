@@ -11,3 +11,7 @@ class DefaultInteractor:
     def scaleout(self) -> usecase.interface.ScaleoutOutput:
         response = self.oci_gateway.apply_rm_stack(stack_id = self.scaleout_stack_id)
         return usecase.interface.ScaleoutOutput(ok = (response.lifecycle_state == "SUCCEEDED"))
+
+    def scalein(self) -> usecase.interface.ScaleoutOutput:
+        response = self.oci_gateway.destroy_rm_stack(stack_id = self.scaleout_stack_id)
+        return usecase.interface.ScaleinOutput(ok = (response.lifecycle_state == "SUCCEEDED"))

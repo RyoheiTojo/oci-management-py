@@ -16,10 +16,23 @@ class OCIGateway(metaclass=ABCMeta):
     def apply_rm_stack(self, stack_id:str) -> domain.entity.job_response:
         raise NotImplementedError
 
+    @abstractmethod
+    def destroy_rm_stack(self, stack_id:str) -> domain.entity.job_response:
+        raise NotImplementedError
+
 class ScaleoutInput:
     pass
 
 class ScaleoutOutput:
+    ok: bool
+
+    def __init__(self, ok:bool):
+        self.ok = ok
+
+class ScaleinInput:
+    pass
+
+class ScaleinOutput:
     ok: bool
 
     def __init__(self, ok:bool):

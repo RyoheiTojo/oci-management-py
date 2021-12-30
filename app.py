@@ -22,8 +22,12 @@ if __name__ == '__main__':
             )
         )
 
-    if sys.argv[1] == "scaleout":
+    subcommand = sys.argv[1]
+
+    if subcommand == "scaleout":
         controller.scaleout()
+    elif subcommand == "scalein":
+        controller.scalein()
     else:
         print("Unknown subcommand.")
         sys.exit(1)

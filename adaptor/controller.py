@@ -9,3 +9,7 @@ class CliController:
     def scaleout(self):
         res = self.usecase.scaleout()
         print(vars(res))
+
+    def scalein(self):
+        res = self.usecase.scalein()
+        print(vars(res))
