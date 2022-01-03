@@ -43,6 +43,9 @@ def getLogger(level:LogLevel):
     return LoggingLogger(level = level)
 
 import logging
+import datetime
+from pythonjsonlogger import jsonlogger
+from pytz import timezone
 
 class LoggingLogger(Logger):
     logger: logging.Logger
@@ -63,13 +66,13 @@ class LoggingLogger(Logger):
 
         sh = logging.StreamHandler()
         sh.setLevel(logging_level)
-        sh.setFormatter(logging.Formatter(fmt))
+        sh.setFormatter(JsonFormatter())
         self.logger.addHandler(sh)
         del sh
 
         fh = logging.FileHandler(path, mode='a', encoding='utf-8')
         fh.setLevel(logging_level)
-        fh.setFormatter(logging.Formatter(fmt))
+        fh.setFormatter(JsonFormatter())
         self.logger.addHandler(fh)
         del fh
 
@@ -84,3 +87,27 @@ class LoggingLogger(Logger):
 
     def error(self, json:Dict):
         self.logger.error(json)
+
+class JsonFormatter(jsonlogger.JsonFormatter):
+
+    def parse(self):
+        return [
+            'process',
+            'timestamp',
+            'level',
+            'name',
+            'message',
+            'stack_info',
+        ]
+
+    def add_fields(self, log_record, record, message_dict):
+        super().add_fields(log_record, record, message_dict)
+        if not log_record.get('timestamp'):
+            # https://qiita.com/yoppe/items/4260cf4ddde69287a632
+            now = datetime.datetime.now(timezone('Asia/Tokyo')).strftime('%Y-%m-%dT%H:%M:%S%z')
+            log_record['timestamp'] = now
+        if log_record.get('level'):
+            log_record['level'] = log_record['level'].upper()
+        else:
+            log_record['level'] = record.levelname
+
