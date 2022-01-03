@@ -1,11 +1,11 @@
-import usecase.interactor
-import utility.logger
+import app.usecase.interactor
+import app.utility.logger
 
 class CliController:
-    usecase: usecase.interactor.DefaultInteractor
-    logger:  utility.logger.LoggingLogger
+    usecase: app.usecase.interactor.DefaultInteractor
+    logger:  app.utility.logger.LoggingLogger
 
-    def __init__(self, usecase:usecase.interactor.DefaultInteractor, logger:utility.logger.LoggingLogger):
+    def __init__(self, usecase:app.usecase.interactor.DefaultInteractor, logger:app.utility.logger.LoggingLogger):
         self.usecase = usecase
         self.logger  = logger
 
@@ -22,4 +22,5 @@ class CliController:
         print(vars(res))
 
     def test(self):
+        self.usecase.test()
         self.logger.debug('hogehoge')

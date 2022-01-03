@@ -1,5 +1,4 @@
 from abc import ABCMeta, abstractmethod
-from typing import Dict
 from enum import IntEnum, auto
 
 class LogLevel(IntEnum):
@@ -24,69 +23,73 @@ class LogLevel(IntEnum):
 
 class Logger(metaclass=ABCMeta):
     @abstractmethod
-    def debug(self, json:Dict):
+    def debug(self, message:str):
         raise NotImplementedError
 
     @abstractmethod
-    def info(self, json:Dict):
+    def info(self, message:str):
         raise NotImplementedError
 
     @abstractmethod
-    def warn(self, json:Dict):
+    def warn(self, message:str):
         raise NotImplementedError
 
     @abstractmethod
-    def error(self, json:Dict):
+    def error(self, message:str):
         raise NotImplementedError
-
-def getLogger(level:LogLevel):
-    return LoggingLogger(level = level)
 
 import logging
 import datetime
 from pythonjsonlogger import jsonlogger
 from pytz import timezone
 
+def setLogger(name:str, level:LogLevel, path:str):
+    logging_level = logging.ERROR
+
+    if level == LogLevel.DEBUG:
+        logging_level = logging.DEBUG
+    elif level == LogLevel.INFO:
+        logging_level = logging.INFO
+    elif level == LogLevel.WARN:
+        logging_level = logging.WARN
+    elif level == LogLevel.ERROR:
+        logging_level = logging.ERROR
+
+    logger = logging.getLogger(name)
+    logger.setLevel(logging_level)
+
+    sh = logging.StreamHandler()
+    sh.setLevel(logging_level)
+    sh.setFormatter(JsonFormatter())
+    logger.addHandler(sh)
+    del sh
+
+    fh = logging.FileHandler(path, mode='a', encoding='utf-8')
+    fh.setLevel(logging_level)
+    fh.setFormatter(JsonFormatter())
+    logger.addHandler(fh)
+    del fh
+  
+def getLogger(name:str):
+    return LoggingLogger(logger = logging.getLogger(name))
+
 class LoggingLogger(Logger):
     logger: logging.Logger
 
-    def __init__(self, level:LogLevel, path:str, fmt:str):
-        logging_level = logging.DEBUG
-        if level == LogLevel.DEBUG:
-            logging_level = logging.DEBUG
-        elif level == LogLevel.INFO:
-            logging_level = logging.INFO
-        elif level == LogLevel.WARN:
-            logging_level = logging.WARN
-        elif level == LogLevel.ERROR:
-            logging_level = logging.ERROR
+    def __init__(self, logger:logging.Logger):
+        self.logger = logger
 
-        self.logger = logging.getLogger(__name__)
-        self.logger.setLevel(logging_level)
+    def debug(self, message:str):
+        self.logger.debug(message)
 
-        sh = logging.StreamHandler()
-        sh.setLevel(logging_level)
-        sh.setFormatter(JsonFormatter())
-        self.logger.addHandler(sh)
-        del sh
+    def info(self, message:str):
+        self.logger.info(message)
 
-        fh = logging.FileHandler(path, mode='a', encoding='utf-8')
-        fh.setLevel(logging_level)
-        fh.setFormatter(JsonFormatter())
-        self.logger.addHandler(fh)
-        del fh
+    def warn(self, message:str):
+        self.logger.warn(message)
 
-    def debug(self, json:Dict):
-        self.logger.debug(json)
-
-    def info(self, json:Dict):
-        self.logger.info(json)
-
-    def warn(self, json:Dict):
-        self.logger.warn(json)
-
-    def error(self, json:Dict):
-        self.logger.error(json)
+    def error(self, message:str):
+        self.logger.error(message)
 
 class JsonFormatter(jsonlogger.JsonFormatter):
 

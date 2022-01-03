@@ -1,11 +1,11 @@
 import sys
 
-from utility.logger import LoggingLogger
-from utility.logger import LogLevel
+from app.utility.logger import setLogger, getLogger
+from app.utility.logger import LogLevel
 
-from adaptor.controller import CliController
-from adaptor.gateway import PythonOCIGateway
-from usecase.interactor import DefaultInteractor
+from app.adaptor.controller import CliController
+from app.adaptor.gateway import PythonOCIGateway
+from app.usecase.interactor import DefaultInteractor
 
 from configparser import ConfigParser
 from os import path
@@ -17,17 +17,16 @@ if __name__ == '__main__':
     if len(sys.argv) < 2:
         print("Usage: python3 app.py <subcommand> [option]")
         sys.exit(1)
+
+    setLogger(name = 'app', level = LogLevel.of_string(level = config['Environment']['log_level']), path = config['Environment']['log_path'])
     
     controller = CliController(
         usecase = DefaultInteractor(
             oci_gateway       = PythonOCIGateway(),
-            scaleout_stack_id = config['Scaleout']['stack_id']
+            scaleout_stack_id = config['Scaleout']['stack_id'],
+            logger            = getLogger('app.usecase.interactor')
             ),
-        logger  = LoggingLogger(
-            level = LogLevel.of_string(level = config['Environment']['log_level']),
-            path  = config['Environment']['log_path'],
-            fmt   = config['Environment']['log_fmt'],
-            )
+        logger  = getLogger('app.adaptor.controller')
         )
 
     subcommand = sys.argv[1]
